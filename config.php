@@ -9,8 +9,8 @@ define('DB_USER', 'root');
 define('DB_PASSWORD', '');
 
 // Website settings
-define('WEBSITE_NAME', 'NASA Marketplace');
-define('WEBSITE_URL', 'http://localhost/NASA-OPENPROJECT');
+define('WEBSITE_NAME', 'OpenSciConnect');
+define('WEBSITE_URL', 'http://localhost/NASA-OPENPROJECT/');
 define('ADMIN_EMAIL', 'admin@example.com');
 
 // Other configurations
@@ -19,12 +19,12 @@ define('DEFAULT_LANGUAGE', 'en');
 define('DEBUG_MODE', true);
 
 // email config
-define('SMTP_HOST', 'smtp.gmail.com');
-define('SMTP_USERNAME', 'mukhtarsani20@gmail.com');
-define('SMTP_PASSWORD', 'gdfihtwkszggagep');
-define('SMTP_SECURE', 'tls');
-define('SMTP_PORT', 587);
-define('FROM_EMAIL', 'info@aarashiddata.com');
+// define('SMTP_HOST', 'smtp.gmail.com');
+// define('SMTP_USERNAME', 'mukhtarsani20@gmail.com');
+// define('SMTP_PASSWORD', 'gdfihtwkszggagep');
+// define('SMTP_SECURE', 'tls');
+// define('SMTP_PORT', 587);
+// define('FROM_EMAIL', 'info@aarashiddata.com');
 
 // Start the session
 session_start();

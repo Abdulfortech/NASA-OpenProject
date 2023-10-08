@@ -17,7 +17,7 @@ class User
         */
         if (isset($_SESSION['nasa_user_id'])) {
             $userId = $_SESSION['nasa_user_id'];
-            $query = "SELECT userId, firstName, lastName, dob, gender, phone, email, state, nationality, address, isVerified FROM users
+            $query = "SELECT userId, firstName, lastName, dob, gender, phone, email, state, nationality, address, skills, isVerified FROM users
             WHERE userId = :userId";
             $stmt = $this->db->prepare($query);
             $stmt->bindParam(':userId', $userId);
@@ -30,12 +30,28 @@ class User
         return null;
     }
 
-    public function updateUserInfo($firstName, $lastName, $userId, $dob, $gender, $email, $phone, $state, $address, $nationality)
+    public function getUser($userId)
+    {
+        if (isset($_SESSION['nasa_user_id'])) {
+            $query = "SELECT userId, firstName, lastName, dob, gender, phone, email, state, nationality, address, skills FROM users
+            WHERE userId = :userId";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':userId', $userId);
+            $stmt->execute();
+            $userDetails = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            return $userDetails;
+        }
+
+        return null;
+    }
+
+    public function updateUserInfo($firstName, $lastName, $userId, $dob, $gender, $email, $phone, $state, $address, $nationality, $skills)
     {
 
 
         // Prepare the update query
-        $query = "UPDATE users SET firstName = :firstName, lastName = :lastName, dob = :dob, gender = :gender, email = :email, phone = :phone, state = :state, address = :address, nationality=:nationality WHERE userId = :userId";
+        $query = "UPDATE users SET firstName = :firstName, lastName = :lastName, dob = :dob, gender = :gender, email = :email, phone = :phone, state = :state, address = :address, nationality=:nationality, skills=:skills WHERE userId = :userId";
         $statement = $this->db->prepare($query);
 
         // Bind the parameters
@@ -48,6 +64,7 @@ class User
         $statement->bindParam(':state', $state);
         $statement->bindParam(':address', $address);
         $statement->bindParam(':nationality', $nationality);
+        $statement->bindParam(':skills', $skills);
         $statement->bindParam(':userId', $userId);
 
         // Execute the update query
@@ -125,10 +142,16 @@ switch ($action) {
         header('Content-Type: application/json');
         echo json_encode($response);
         break;
+    case "fetch_user":
+        $userId = $_GET['userId'];
+        $response = $getUser($userId);
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        break;
     case 'update_user_profile':
         $response = array();
-        $firstName = filter_input(INPUT_POST, 'first-name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $lastName = filter_input(INPUT_POST, 'last-name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $firstName = filter_input(INPUT_POST, 'fname', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $lastName = filter_input(INPUT_POST, 'lname', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $userId = $_POST['userId'];
         $dob = $_POST['dob'];
         $gender = $_POST['gender'];
@@ -136,28 +159,22 @@ switch ($action) {
         $phone = filter_input(INPUT_POST, 'phone', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $state = $_POST['state'];
         $nationality = $_POST['nationality'];
+        $skills = implode(',', $_POST['skills']);
         $address = filter_input(INPUT_POST, 'address', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        // Check if the email already exists
-        $emailExists = $user->checkEmailExists($email, $userId);
-
-        if ($usernameExists) {
-            $response['success'] = false;
-            $response['message'] = "Username already exists";
-        } elseif ($emailExists) {
-            $response['success'] = false;
-            $response['message'] = "Email already exists";
+        
+        $update = $user->updateUserInfo($firstName, $lastName, $userId, $dob, $gender, $email, $phone, $state, $address, $nationality, $skills);
+        if ($update) {
+            $response['success'] = true;
+            $response['message'] = "Updated successfully!";
+            $_SESSION['msg'] = "Profile has been updated successfully";
         } else {
-            $update = $user->updateUserInfo($firstName, $lastName, $userId, $dob, $gender, $email, $phone, $state, $address, $nationality);
-            if ($update) {
-                $response['success'] = true;
-                $response['message'] = "Updated successfully!";
-            } else {
-                $response['success'] = false;
-                $response['message'] = "An error occurred! Please try again later.";
-            }
-        }
-        header('Content-Type: application/json');
-        echo json_encode($response);
+            $response['success'] = false;
+            $response['message'] = "An error occurred! Please try again later.";
+            $_SESSION['msg'] = "An error occurred! Please try again later.";
+        }        
+        // header('Content-Type: application/json');
+        // echo json_encode($response);
+        header('Location:' . WEBSITE_URL . "app/profile-edit");
         break;
     case 'update_user_password':
         $response = array();
@@ -170,17 +187,21 @@ switch ($action) {
         if ($update === "Incorrect password") {
             $response['success'] = false;
             $response['message'] = "Incorrect password";
+            $_SESSION['msg'] = "Incorrect password.";
         } else if ($update) {
             $response['success'] = true;
             $response['message'] = "Password updated successfully!";
+            $_SESSION['msg'] = "Password updated successfully!";
         } else {
             $response['success'] = false;
             $response['message'] = "Failed to update password. Please try again.";
+            $_SESSION['msg'] = "Failed to update password. Please try again.";
         }
-        header('Content-Type: application/json');
-        echo json_encode($response);
+        // header('Content-Type: application/json');
+        // echo json_encode($response);
+        header('Location:' . WEBSITE_URL . "app/profile-edit");
         break;
     default:
-        echo "an error";
+        // echo "an error";
         break;
 }

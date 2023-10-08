@@ -171,8 +171,8 @@ switch ($action) {
         // var_dump($VirtualAccount);
         $response = array();
         // Sanitize and validate the input
-        $firstName = filter_input(INPUT_POST, 'first-name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $lastName = filter_input(INPUT_POST, 'last-name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $firstName = filter_input(INPUT_POST, 'fname', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $lastName = filter_input(INPUT_POST, 'lname', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
         $phone = filter_input(INPUT_POST, 'phone', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $password = $_POST['password'];

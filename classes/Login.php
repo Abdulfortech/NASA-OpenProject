@@ -22,7 +22,6 @@ class Login
             $stmt->bindParam(':username', $username);
             $stmt->execute();
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
             if ($user) {
                 // User found, check password
                 $storedPassword = $user['password'];
